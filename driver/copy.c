@@ -636,9 +636,7 @@ void createBufferToTextureShaderModule(VkDevice device, VkShaderModule* blitShad
 	spirv[1] = 0x00010000;
 	spirv[2] = 0x14E45250;
 	spirv[3] = 1;
-	spirv[4] = (uint32_t)&shaderModuleCreateInfo;
-	//words start here
-	spirv[5] = 1 << 16;
+	*(VkRpiShaderModuleAssemblyCreateInfoEXT**)&spirv[4] = &shaderModuleCreateInfo;
 
 	VkShaderModuleCreateInfo smci = {0};
 	smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -933,9 +931,7 @@ void createTextureToTextureShaderModule(VkDevice device, VkShaderModule* blitSha
 	spirv[1] = 0x00010000;
 	spirv[2] = 0x14E45250;
 	spirv[3] = 1;
-	spirv[4] = (uint32_t)&shaderModuleCreateInfo;
-	//words start here
-	spirv[5] = 1 << 16;
+	*(VkRpiShaderModuleAssemblyCreateInfoEXT**)&spirv[4] = &shaderModuleCreateInfo;
 
 	VkShaderModuleCreateInfo smci = {0};
 	smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
