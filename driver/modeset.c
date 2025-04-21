@@ -14,6 +14,8 @@ typedef struct vsyncData
 	uint64_t seqno;
 } vsyncData;
 
+modeset_saved_state modeset_saved_states[32];
+
 #define FLIP_FIFO_SIZE 2
 
 static uint32_t refCount = 0;
