@@ -22,7 +22,7 @@ ConsecutivePoolAllocator createConsecutivePoolAllocator(void* b, unsigned bs, un
 	};
 
 	//initialize linked list of free pointers
-	uint32_t* ptr = pa.nextFreeBlock;
+	uintptr_t* ptr = pa.nextFreeBlock;
 	unsigned last = s/bs - 1;
 	for(unsigned c = 0; c < last; ++c)
 	{
@@ -52,7 +52,7 @@ uint32_t consecutivePoolAllocate(ConsecutivePoolAllocator* pa, uint32_t numBlock
 	assert(pa->buf);
 	assert(numBlocks);
 
-	uint32_t* ptr = pa->nextFreeBlock;
+	uintptr_t* ptr = pa->nextFreeBlock;
 
 	if(!ptr)
 	{
@@ -63,7 +63,7 @@ uint32_t consecutivePoolAllocate(ConsecutivePoolAllocator* pa, uint32_t numBlock
 	{
 		uint32_t found = 1;
 		char* nextBlock = (char*)ptr + pa->blockSize;
-		uint32_t* nextFree = *ptr;
+		uintptr_t* nextFree = *ptr;
 		for(uint32_t c = 1; c != numBlocks; ++c)
 		{
 			if(nextBlock == nextFree)
@@ -81,7 +81,7 @@ uint32_t consecutivePoolAllocate(ConsecutivePoolAllocator* pa, uint32_t numBlock
 		if(found)
 		{
 			//set the next free block to the one that the last block we allocated points to
-			uint32_t* nextFreeBlockCandidate = *(uint32_t*)((char*)ptr + (numBlocks - 1) * pa->blockSize);
+			uintptr_t* nextFreeBlockCandidate = *(uintptr_t*)((char*)ptr + (numBlocks - 1) * pa->blockSize);
 
 			if(pa->nextFreeBlock == ptr)
 			{
@@ -89,8 +89,8 @@ uint32_t consecutivePoolAllocate(ConsecutivePoolAllocator* pa, uint32_t numBlock
 				break;
 			}
 
-			uint32_t* prevPtr = pa->nextFreeBlock;
-			uint32_t* currPtr = prevPtr;
+			uintptr_t* prevPtr = pa->nextFreeBlock;
+			uintptr_t* currPtr = prevPtr;
 			for(; currPtr; currPtr = *currPtr)
 			{
 				if(currPtr == ptr)
@@ -143,12 +143,12 @@ void consecutivePoolFree(ConsecutivePoolAllocator* pa, void* p, uint32_t numBloc
 		char* listPtr = pa->nextFreeBlock;
 		for(uint32_t c = 0; c < numBlocks - 1; ++c)
 		{
-			*(uint32_t*)listPtr = listPtr + pa->blockSize;
+			*(uintptr_t*)listPtr = listPtr + pa->blockSize;
 			listPtr += pa->blockSize;
 		}
 
 		//end list
-		*(uint32_t*)listPtr = 0;
+		*(uintptr_t*)listPtr = 0;
 	}
 	else
 	{
@@ -156,25 +156,25 @@ void consecutivePoolFree(ConsecutivePoolAllocator* pa, void* p, uint32_t numBloc
 
 		//search free list to see if the freed element fits anywhere
 		uint32_t found = 0;
-		for(uint32_t* listPtr = pa->nextFreeBlock; listPtr; listPtr = *listPtr)
+		for(uintptr_t* listPtr = pa->nextFreeBlock; listPtr; listPtr = *listPtr)
 		{
 			//if the freed block fits in the list somewhere
 			if(((char*)listPtr + pa->blockSize) == p)
 			{
 				//add it into the list
-				uint32_t* tmp = *listPtr;
+				uintptr_t* tmp = *listPtr;
 				*listPtr = p;
 
 				//reconstruct linked list within the freed element
 				char* ptr = *listPtr;
 				for(uint32_t c = 0; c < numBlocks - 1; ++c)
 				{
-					*(uint32_t*)ptr = ptr + pa->blockSize;
+					*(uintptr_t*)ptr = ptr + pa->blockSize;
 					ptr += pa->blockSize;
 				}
 
 				//set the last element to point to the one after
-				*(uint32_t*)ptr = tmp;
+				*(uintptr_t*)ptr = tmp;
 
 				found = 1;
 			}
@@ -183,18 +183,18 @@ void consecutivePoolFree(ConsecutivePoolAllocator* pa, void* p, uint32_t numBloc
 		if(!found)
 		{
 			//if it doesn't fit anywhere, just simply add it to the linked list
-			uint32_t* tmp = pa->nextFreeBlock;
+			uintptr_t* tmp = pa->nextFreeBlock;
 
 			pa->nextFreeBlock = p;
 			char* listPtr = pa->nextFreeBlock;
 			for(uint32_t c = 0; c < numBlocks - 1; ++c)
 			{
-				*(uint32_t*)listPtr = listPtr + pa->blockSize;
+				*(uintptr_t*)listPtr = listPtr + pa->blockSize;
 				listPtr += pa->blockSize;
 			}
 
 			//set the last element to point to the one after
-			*(uint32_t*)listPtr = tmp;
+			*(uintptr_t*)listPtr = tmp;
 		}
 	}
 
@@ -211,9 +211,9 @@ uint32_t consecutivePoolReAllocate(ConsecutivePoolAllocator* pa, void* currentMe
 	//TODO hack
 	if(newNumBlocks - currNumBlocks < 2)
 	{
-		uint32_t* nextCandidate = (char*)currentMem + pa->blockSize * currNumBlocks;
-		uint32_t* prevPtr = 0;
-		for(uint32_t* listPtr = pa->nextFreeBlock; listPtr; listPtr = *listPtr)
+		uintptr_t* nextCandidate = (char*)currentMem + pa->blockSize * currNumBlocks;
+		uintptr_t* prevPtr = 0;
+		for(uintptr_t* listPtr = pa->nextFreeBlock; listPtr; listPtr = *listPtr)
 		{
 			if(listPtr == nextCandidate)
 			{
@@ -280,7 +280,7 @@ void CPAdebugPrint(ConsecutivePoolAllocator* pa)
 	}
 
 	fprintf(stderr, "\nLinked List walk:\n");
-	for(uint32_t* ptr = pa->nextFreeBlock; ptr; ptr = *ptr)
+	for(uintptr_t* ptr = pa->nextFreeBlock; ptr; ptr = *ptr)
 	{
 		fprintf(stderr, "%p: %p, ", ptr, *ptr);
 	}
