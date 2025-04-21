@@ -54,7 +54,7 @@ typedef struct modeset_saved_state {
 	drmModeCrtcPtr crtc;
 } modeset_saved_state;
 
-modeset_saved_state modeset_saved_states[32];
+extern modeset_saved_state modeset_saved_states[32];
 
 void modeset_enum_displays(int fd, uint32_t* numDisplays, modeset_display* displays);
 void modeset_enum_modes_for_display(int fd, uint32_t display, uint32_t* numModes, modeset_display_mode* modes);
