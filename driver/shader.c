@@ -20,7 +20,7 @@ VkResult RPIFUNC(vkCreateShaderModule)(VkDevice device, const VkShaderModuleCrea
 	PROFILESTART(RPIFUNC(vkCreateShaderModule));
 
 	uint32_t magic = pCreateInfo->pCode[2];
-	VkRpiShaderModuleAssemblyCreateInfoEXT* ci = pCreateInfo->pCode[4];
+	VkRpiShaderModuleAssemblyCreateInfoEXT* ci = *(VkRpiShaderModuleAssemblyCreateInfoEXT**)(&pCreateInfo->pCode[4]);
 
 	//shader magic doesn't add up
 	if(magic != 0x14E45250)

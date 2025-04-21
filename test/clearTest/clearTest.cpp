@@ -637,7 +637,7 @@ void createDepthBuffer()
 		imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		imageMemoryBarrier.image = depthImageView;
+		imageMemoryBarrier.image = (VkImage)depthImageView;
 		imageMemoryBarrier.subresourceRange = view.subresourceRange;
 
 		VkCommandBufferBeginInfo beginInfo = {};
@@ -1270,9 +1270,7 @@ void CreateShaders()
 	spirv[1] = 0x00010000;
 	spirv[2] = 0x14E45250;
 	spirv[3] = 1;
-	spirv[4] = (uint32_t)&shaderModuleCreateInfo;
-	//words start here
-	spirv[5] = 1 << 16;
+	*(VkRpiShaderModuleAssemblyCreateInfoEXT**)&spirv[4] = &shaderModuleCreateInfo;
 
 	VkShaderModuleCreateInfo smci = {};
 	smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
